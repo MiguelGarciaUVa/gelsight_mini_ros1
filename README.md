@@ -79,6 +79,21 @@ Dual:
 ```
 roslaunch gelsight_mini_ros1 gelsight_dual.launch
 ```
+
+**Device selection (`device_index`)**
+
+The GelSight Mini may appear as multiple V4L2 devices (e.g. `video-index0` and `video-index1`). In many setups, only one of them provides a valid video stream.  
+Use the `device_index` launch argument to select the correct one, and note that the index can change depending on camera enumeration order (especially with multiple cameras).
+
+Examples:
+```bash
+# Single sensor
+roslaunch gelsight_mini_ros1 gelsight_left.launch device_index:=0
+
+# Dual sensor
+roslaunch gelsight_mini_ros1 gelsight_dual.launch left_device_index:=0 right_device_index:=1
+```
+
 #### 2) View the image
 ```
 rqt_image_view
