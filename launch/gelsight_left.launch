@@ -1,10 +1,11 @@
 <launch>
+  <arg name="device_index" default="0" />
+
   <group ns="gelsight_left">
     <node pkg="gelsight_mini_ros1" type="gelsight_mini_node.py" name="node" output="screen">
-      <!-- Selección de device con tu librería -->
-      <param name="device_index" value="1"/>
+      <param name="device_index" value="$(arg device_index)"/>
 
-      <!-- Frecuencia / imagen -->
+      <!-- Rate / image -->
       <param name="fps" value="15"/>
       <param name="target_width" value="640"/>
       <param name="target_height" value="480"/>
@@ -18,9 +19,8 @@
       <param name="blur_ksize" value="7"/>
       <param name="baseline_frames" value="20"/>
     </node>
-    
+
     <node pkg="tf2_ros" type="static_transform_publisher" name="gelsight_left_tf"
       args="0 0 0 0 0 0 base_link gelsight_left_frame" />
-
   </group>
 </launch>

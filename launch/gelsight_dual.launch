@@ -1,7 +1,10 @@
 <launch>
+  <arg name="left_device_index"  default="0" />
+  <arg name="right_device_index" default="1" />
+
   <group ns="gelsight_left">
     <node pkg="gelsight_mini_ros1" type="gelsight_mini_node.py" name="node" output="screen">
-      <param name="device_index" value="1"/>
+      <param name="device_index" value="$(arg left_device_index)"/>
 
       <param name="fps" value="15"/>
       <param name="target_width" value="640"/>
@@ -19,7 +22,7 @@
 
   <group ns="gelsight_right">
     <node pkg="gelsight_mini_ros1" type="gelsight_mini_node.py" name="node" output="screen">
-      <param name="device_index" value="2"/>
+      <param name="device_index" value="$(arg right_device_index)"/>
 
       <param name="fps" value="15"/>
       <param name="target_width" value="640"/>
