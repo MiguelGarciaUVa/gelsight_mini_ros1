@@ -58,7 +58,7 @@ sudo apt-get install -y \
 Clone into your catkin workspace:
 ```
 cd ~/catkin_workspace/src
-git clone <YOUR_REPO_URL>.git
+git clone https://github.com/MiguelGarciaUVa/gelsight_mini_ros1.git
 cd ..
 catkin_make
 source devel/setup.bash
