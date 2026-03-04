@@ -53,151 +53,137 @@ sudo apt-get install -y \
   ros-noetic-image-view \
   ros-noetic-rqt-image-view \
   ros-noetic-tf2-ros
-
+```
 ### Build
 Clone into your catkin workspace:
-
+```
 cd ~/catkin_workspace/src
 git clone <YOUR_REPO_URL>.git
 cd ..
 catkin_make
 source devel/setup.bash
-
-Quickstart
-1) Launch a single sensor
+```
+---
+### Quickstart
+#### 1) Launch a single sensor
 
 This starts the left GelSight in namespace /gelsight_left:
-
+```
 roslaunch gelsight_mini_ros1 gelsight_left.launch
-
-
+```
 Or right:
-
+```
 roslaunch gelsight_mini_ros1 gelsight_right.launch
-
-
+```
 Dual:
-
+```
 roslaunch gelsight_mini_ros1 gelsight_dual.launch
-
-2) View the image
+```
+#### 2) View the image
+```
 rqt_image_view
-
-
+```
 Select:
 
-/gelsight_left/image_raw (or /gelsight_right/image_raw)
+`/gelsight_left/image_raw` (or `/gelsight_right/image_raw`)
 
-3) Calibrate baseline (for contact mask)
+#### 3) Calibrate baseline (for contact mask)
 
 Run this with the sensor not touching anything:
-
+```
 rosservice call /gelsight_left/calibrate_baseline "{}"
+```
 
-4) Run point cloud node
+#### 4) Run point cloud node
 
 In the same namespace as the driver:
-
+```
 rosrun gelsight_mini_ros1 gelsight_pointcloud_node.py __ns:=/gelsight_left _frame_id:=gelsight_left_frame
+```
 
-5) Visualize point cloud in RViz (no TF)
+#### 5) Visualize point cloud in RViz (no TF)
 
-If you don't publish TF yet, set RViz Fixed Frame to:
+If you don't publish TF yet, set **RViz → Fixed Frame** to:
 
-gelsight_left_frame
+- `gelsight_left_frame`
 
-Then add:
+Then add these displays:
 
-PointCloud2: /gelsight_left/points
+- **PointCloud2**: `/gelsight_left/points`
+- **Image**: `/gelsight_left/mask`
+- **Image**: `/gelsight_left/depth`
 
-Image: /gelsight_left/mask, /gelsight_left/depth
 
-TF (recommended)
+### TF (recommended)
 
-To visualize in a global robot frame (e.g. base_link) publish a static TF:
+To visualize in a global robot frame (e.g. `base_link`), publish a static transform:
 
+```bash
 rosrun tf2_ros static_transform_publisher 0 0 0 0 0 0 base_link gelsight_left_frame
+```
+Then in RViz set:
+- **Fixed Frame** = `base_link`
 
+---
 
-Then in RViz:
+## Topics
+### Driver node (namespace example: `/gelsight_left`)
+- `/gelsight_left/image_raw` (`sensor_msgs/Image`)
+- `/gelsight_left/contact_mask` (`sensor_msgs/Image`, `mono8`)
+- `/gelsight_left/contact` (`std_msgs/Bool`)
+- `/gelsight_left/contact_area` (`std_msgs/Float32`)
+- `/gelsight_left/contact_center` (`geometry_msgs/PointStamped`)
 
-Fixed Frame = base_link
+### PointCloud node
+- `/gelsight_left/mask` (`sensor_msgs/Image`, `mono8`)
+- `/gelsight_left/depth` (`sensor_msgs/Image`, `32FC1`)
+- `/gelsight_left/points` (`sensor_msgs/PointCloud2`)
 
-You can also add the static transform publisher to your launch file.
+---
 
-Topics
-Driver node (namespace example: /gelsight_left)
+## Parameters
 
-/gelsight_left/image_raw (sensor_msgs/Image)
+### Common
+- `~fps` (default: `15`)
+- `~frame_id` (default: `gelsight_frame`)
+- `~encoding` (`rgb8` or `bgr8`)
 
-/gelsight_left/contact_mask (sensor_msgs/Image, mono8)
+### GelSightMini acquisition
+- `~device_index` (default: `1`) — index passed to `select_device()`
+- `~target_width` (default: `640`)
+- `~target_height` (default: `480`)
+- `~border_fraction` (default: `0.15`)
 
-/gelsight_left/contact (std_msgs/Bool)
+### Contact mask
+- `~mask_threshold` (default: `25.0`)
+- `~min_area` (default: `400.0`)
+- `~blur_ksize` (default: `7`)
+- `~baseline_frames` (default: `20`)
 
-/gelsight_left/contact_area (std_msgs/Float32)
+### PointCloud (proxy)
+- `~xy_scale` (default: `0.0002`) — meters per pixel
+- `~z_scale` (default: `1e-5`) — meters per diff unit
+- `~pc_step` (default: `2`) — point downsample step
 
-/gelsight_left/contact_center (geometry_msgs/PointStamped)
+---
 
-PointCloud node
+## Notes
 
-/gelsight_left/mask (sensor_msgs/Image, mono8)
+If you use a Python environment (conda/venv), make sure you run nodes with the ROS environment sourced:
 
-/gelsight_left/depth (sensor_msgs/Image, 32FC1)
-
-/gelsight_left/points (sensor_msgs/PointCloud2)
-
-Parameters
-Common
-
-~fps (default: 15)
-
-~frame_id (default: gelsight_frame)
-
-~encoding (rgb8 or bgr8)
-
-GelSightMini acquisition
-
-~device_index (default: 1) index passed to select_device()
-
-~target_width (default: 640)
-
-~target_height (default: 480)
-
-~border_fraction (default: 0.15)
-
-Contact mask
-
-~mask_threshold (default: 25.0)
-
-~min_area (default: 400.0)
-
-~blur_ksize (default: 7)
-
-~baseline_frames (default: 20)
-
-PointCloud (proxy)
-
-~xy_scale (default: 0.0002) meters per pixel
-
-~z_scale (default: 1e-5) meters per diff unit
-
-~pc_step (default: 2) point downsample step
-
-Notes
-
-If you use a Python environment (conda/venv), make sure you run nodes with ROS environment sourced:
-
+```bash
 source /opt/ros/noetic/setup.bash
 source ~/catkin_workspace/devel/setup.bash
+```
+
+`device_index` mapping can change depending on camera enumeration order. For stable multi-sensor setups, prefer selecting by serial/path when available.
+
+---
+
+## Acknowledgements
 
 
-device_index mapping can change depending on camera enumeration order. For stable multi-sensor setups, prefer selecting by serial/path when available.
+This ROS wrapper builds on the official **GelSight `gsrobotics`** Python SDK and its demo pipelines (live view, image-based depth/point cloud visualization). The goal is to expose similar outputs through a ROS1 interface for easier integration and RViz visualization.
 
-Acknowledgements
-
-This wrapper is inspired by GelSight's gsrobotics utilities and demos (live view, depth and 3D visualization) and exposes similar outputs as ROS topics.
-
-
-Si me dices:
-- el nombre real de tus scripts (driver + pointcloud),
-- y si vas a incluir dentro del repo la carpeta `utilities/` o la vas a dejar como dependencia,
+- GelSight `gsrobotics` SDK (GitHub): https://github.com/gelsightinc/gsrobotics  
+- GelSight (company / products): https://www.gelsight.com/
