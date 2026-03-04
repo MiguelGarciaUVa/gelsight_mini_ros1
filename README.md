@@ -187,3 +187,8 @@ This ROS wrapper builds on the official **GelSight `gsrobotics`** Python SDK and
 
 - GelSight `gsrobotics` SDK (GitHub): https://github.com/gelsightinc/gsrobotics  
 - GelSight (company / products): https://www.gelsight.com/
+
+---
+
+## License
+This project is licensed under the GPL-3.0 License. See the `LICENSE` file for details.
